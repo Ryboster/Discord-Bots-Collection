@@ -66,9 +66,11 @@ class MyClient(discord.Client):
             print('Shutting down ...')
             await self.close()
             quit()
-        elif message.author.id == 999736048596816014:
+        elif message.author.id == 719806770133991434:
             fc = message.guild.get_member(434807903623577620)
-            await fc.send('new epic games available')
+            if message.embeds:
+                for embed in message.embeds:
+                    await fc.send(embed.description)
 
 client = MyClient(intents=discord.Intents.all())
 client.run(token)
