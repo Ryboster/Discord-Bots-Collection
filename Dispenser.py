@@ -14,14 +14,16 @@ class MyClient(discord.Client):
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
         #message ID's
-        self.target_ids = [1020307735801253898]
+        self.target_ids = [1020307735801253898, 1153666715503312966]
         self.authors = [434807903623577620, 572358282895818753, 378985376435404800]
         
         #Emojis and their corresponding roles
         self.emoji_roles = {
             # Emoji: Role
             '♂️': '♂MALE',
-            '♀️': '♀FEMALE '
+            '♀️': '♀FEMALE',
+            '🔼': "⬆️18",
+            '🔽': '⬇️18'
             # Add more emoji-role mappings as needed
         }
 
