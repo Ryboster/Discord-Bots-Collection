@@ -58,7 +58,7 @@ class MyClient(discord.Client):
                 role = discord.utils.get(guild.roles, name=self.emoji_roles[payload.emoji.name])
                 await member.remove_roles(role)
 
-    @client.event
+    @discord.Client(intents=discord.Intents.all()).event
     async def on_message(self, message):
         if message.content == "!!exit" and message.author in self.authors:
             print('Shutting down ...')
