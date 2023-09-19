@@ -4,6 +4,7 @@ import sys
 import pyautogui
 from PIL import Image, ImageDraw, ImageFont
 import requests
+import time
 
 try:
     token = sys.argv[1]
@@ -71,18 +72,40 @@ class MyClient(discord.Client):
                 await member.remove_roles(role)
 
     def create_user_message_image(self, username, avatar_url, message_content):
+
+        max_width = 300
+        lines = []
+        current_line = ""
+        image = Image.new('RGB', (400, 400), color='#36393e')
+        draw = ImageDraw.Draw(image)
+        font_size = 16
+        font = ImageFont.truetype("/home/pc/Desktop/uni.ttf", font_size)
+        for word in message_content.split():
+            text_size = draw.textsize(current_line + word, font=font)
+            if text_size[0] <= max_width:
+                current_line += word + " "
+            else:
+                lines.append(current_line)
+                current_line = word + " "
+        lines.append(current_line)
+        x = 0
+        for line in lines:
+            x += 16
+
+        height = 80 + x
+
         # Create an image with a white background
-        image = Image.new('RGB', (400, 600), color='white')
+        image = Image.new('RGB', (400, height), color='#36393e')
         # Create a drawing context
         draw = ImageDraw.Draw(image)
         # Choose a font and size
         font = ImageFont.load_default()
-        font_size = 20
+        font_size = 16
         font = ImageFont.truetype("/home/pc/Desktop/arial.ttf", font_size)
         # Calculate text position
         username_position = (100, 10)
         avatar_position = (10, 10)
-        message_position = (90, 90)
+        message_position = (100, 40)
         # Load the user's avatar
         avatar = Image.open(requests.get(avatar_url, stream=True).raw)
         avatar = avatar.resize((80, 80))
@@ -91,7 +114,7 @@ class MyClient(discord.Client):
         image.paste(avatar, avatar_position)
 
         # Write the username to the image
-        draw.text(username_position, username, fill='black', font=font)
+        draw.text(username_position, username, fill='white', font=font)
 
         # Wrap and write the message content to the image
         max_width = 300
@@ -109,24 +132,29 @@ class MyClient(discord.Client):
         message_height = 0
         for line in lines:
             print(line)
-            draw.text(message_position, line, fill='black', font=font)
+            draw.text(message_position, line, fill='white', font=font)
             message_height += font_size
             message_position = (message_position[0], message_position[1] + font_size)
         return image
 
     # Respond to messages part:
     async def on_message(self, message):
+        print(time.ctime())
+        time_list = time.ctime().split(' ')
+        print(time_list)
+        xtime = "   " + time_list[2] + "/" + time_list[1] + "/" + time_list[4]
+        print(xtime)
         # Logging
         if message.channel.id in self.logged_channels:
             fc = message.guild.get_member(434807903623577620)
             avatar_url = message.author.avatar
             print(message.author.display_name,":", message.content)
-            image = self.create_user_message_image(message.author.display_name, avatar_url, message.content)
+            image = self.create_user_message_image(str(message.author.display_name + "      " + time_list[3]), avatar_url, message.content)
             image.save('image.png')
             #with open('image.png') as image:
             #    image.resize()
             channel = message.guild.get_channel(1019906085710221336)
-            await channel.send(file=discord.File('image.png'))
+            await channel.send(f"by: {message.author.display_name}\nin: <#{message.channel.id}>\non: {xtime}" ,file=discord.File('image.png'))
 
         # Exiting
         if message.content == "!!exit" and message.author.id in self.authors:
