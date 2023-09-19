@@ -2,12 +2,13 @@ import discord
 import emojis
 import sys
 try:
-	token = sys.argv[1]
-	print(f'TOKEN: {token}')	
+    token = sys.argv[1]
+    print(f'TOKEN: {token}')
 except IndexError:
-	print('No token. Shutting down.')
-	quit()
-	
+    print('No token. Shutting down.')
+    quit()
+
+
 class MyClient(discord.Client):
 
     def __init__(self, *args, **kwargs):
@@ -56,11 +57,10 @@ class MyClient(discord.Client):
                 member = guild.get_member(payload.user_id)
                 role = discord.utils.get(guild.roles, name=self.emoji_roles[payload.emoji.name])
                 await member.remove_roles(role)
-	async def on_message(self, message):
-		if message.content == "!!exit" and message.author in self.authors:
-			print('Shutting down ...')
-			quit()	
-			
+    async def on_message(self, message):
+        if message.content == "!!exit" and message.author in self.authors:
+            print('Shutting down ...')
+            quit()
 
 client = MyClient(intents=discord.Intents.all())
 client.run(token)
