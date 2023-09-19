@@ -28,6 +28,10 @@ class MyClient(discord.Client):
             '🔽': '⬇️18'
         }
 
+        self.logged_channels = [1020305021553868850, 1019906084774887463, 1019906085001375765, 1049005443239911494, 1019906085001375773,
+                                1026863916069961748, 1025790628631695570, 1025900669082800158, 1026597897279639612, 1030518678892068864,
+                               1116089292524097647]
+
 # Startup part:
     async def on_ready(self):
         print(f'logged in as {discord.Client}')
@@ -62,10 +66,23 @@ class MyClient(discord.Client):
 
 # Respond to messages part:
     async def on_message(self, message):
+        # Logging
+        if message.channel.id in self.logged_channels:
+            embed = discord.Embed(
+                title=message.author.name,
+                description=message.content,
+                color=discord.Color.blue())
+            fc = message.guild.get_member(434807903623577620)
+            fc.send(embed=embed)
+
+
+        # Exitting
         if message.content == "!!exit" and message.author.id in self.authors:
             print('Shutting down ...')
             await self.close()
             quit()
+            
+        # Reminding
         elif message.author.id == 719806770133991434:
             if message.embeds:
                 for embed in message.embeds:
@@ -75,7 +92,7 @@ class MyClient(discord.Client):
                             await user.send(embed.description)
                         except:
                             print(f'Tried sending reminder to user {id}. User not in visible server')
-                            
+        # RNG
         elif message.content.startswith('!!roll') and message.author.id in self.authors:
         match = re.search(r'!!roll (\d+)', message.content)
         if match:
