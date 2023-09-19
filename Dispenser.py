@@ -139,13 +139,11 @@ class MyClient(discord.Client):
 
     # Respond to messages part:
     async def on_message(self, message):
-        print(time.ctime())
         time_list = time.ctime().split(' ')
-        print(time_list)
         xtime = "   " + time_list[2] + "/" + time_list[1] + "/" + time_list[4]
-        print(xtime)
+        
         # Logging
-        if message.channel.id in self.logged_channels:
+        if message.channel.id in self.logged_channels and message.author.id != 719806770133991434:
             fc = message.guild.get_member(434807903623577620)
             avatar_url = message.author.avatar
             print(message.author.display_name,":", message.content)
@@ -171,7 +169,7 @@ class MyClient(discord.Client):
                             user = message.guild.get_member(id)
                             await user.send(embed.title + "\n" + embed.description)
                         except:
-                            print(f'Tried sending reminder to user {id}. User not in visible server')
+                            print(f'Tried sending reminder to user {message.author.display_name}. User not in visible server')
         # RNG
         elif message.content.startswith('!!roll') and message.author.id in self.authors:
             match = re.search(r'!!roll (\d+)', message.content)
