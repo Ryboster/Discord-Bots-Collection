@@ -5,6 +5,8 @@ import pyautogui
 from PIL import Image, ImageDraw, ImageFont
 import requests
 import time
+import re
+from random import randint
 
 try:
     token = sys.argv[1]
