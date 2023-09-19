@@ -75,6 +75,12 @@ class MyClient(discord.Client):
                             await user.send(embed.description)
                         except:
                             print(f'Tried sending reminder to user {id}. User not in visible server')
+                            
+        elif message.content.startswith('!!roll') and message.author.id in self.authors:
+        match = re.search(r'!!roll (\d+)', message.content)
+        if match:
+            value = int(match.group(1))
+            await message.channel.send(randint(1, value))
 
 
 client = MyClient(intents=discord.Intents.all())
