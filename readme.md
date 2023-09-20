@@ -13,6 +13,7 @@ Dispenser takes the token as a cmd line argument.
 python3 Dispenser.py TOKEN
 ```
 Key lists:
+
 ```
 self.target_ids = Messages for reaction roles. Add channel ID's to assign roles corresponding to emojis.
 self.authors = Effective administrators of the bot. Add user ID's for users of all privileges.
