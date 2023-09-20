@@ -73,17 +73,15 @@ class MyClient(discord.Client):
                 await member.remove_roles(role)
 
     def create_user_message_image(self, username, avatar_url, message_content):
-
-        max_width = 300
+        
+        # Calculate image height
         lines = []
         current_line = ""
-        image = Image.new('RGB', (400, 400), color='#36393e')
-        draw = ImageDraw.Draw(image)
-        font_size = 16
-        font = ImageFont.truetype("/home/pc/Desktop/uni.ttf", font_size)
+        draw = ImageDraw.Draw(Image.new('RGB', (400, 400), color='#36393e'))
+        font = ImageFont.truetype("/home/pc/Desktop/arial.ttf", 16)
         for word in message_content.split():
             text_size = draw.textsize(current_line + word, font=font)
-            if text_size[0] <= max_width:
+            if text_size[0] <= 300:
                 current_line += word + " "
             else:
                 lines.append(current_line)
@@ -92,7 +90,6 @@ class MyClient(discord.Client):
         x = 0
         for line in lines:
             x += 16
-
         height = 80 + x
 
         # Create an image with a white background
@@ -103,7 +100,8 @@ class MyClient(discord.Client):
         font = ImageFont.load_default()
         font_size = 16
         font = ImageFont.truetype("/home/pc/Desktop/arial.ttf", font_size)
-        # Calculate text position
+        
+        # Set text position
         username_position = (100, 10)
         avatar_position = (10, 10)
         message_position = (100, 40)
@@ -116,19 +114,6 @@ class MyClient(discord.Client):
 
         # Write the username to the image
         draw.text(username_position, username, fill='white', font=font)
-
-        # Wrap and write the message content to the image
-        max_width = 300
-        lines = []
-        current_line = ""
-        for word in message_content.split():
-            text_size = draw.textsize(current_line + word, font=font)
-            if text_size[0] <= max_width:
-                current_line += word + " "
-            else:
-                lines.append(current_line)
-                current_line = word + " "
-        lines.append(current_line)
 
         message_height = 0
         for line in lines:
