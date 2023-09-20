@@ -72,8 +72,15 @@ class MyClient(discord.Client):
                 role = discord.utils.get(guild.roles, name=self.emoji_roles[payload.emoji.name])
                 await member.remove_roles(role)
 
-    def create_user_message_image(self, username, avatar_url, message_content):
-        
+    def create_user_message_image(self, username, avatar_url, message_content, *args):
+        attachment_urls = False
+        attachments_list = False
+
+        if args:
+            print(f'{len(args)} arguments received')
+            if 'attachments' in str(args[0]).split('/'):
+                attachment_urls = args[0]
+                print(args)
         # Calculate image height
         lines = []
         current_line = ""
@@ -87,20 +94,47 @@ class MyClient(discord.Client):
                 lines.append(current_line)
                 current_line = word + " "
         lines.append(current_line)
-        x = 0
-        for line in lines:
-            x += 16
-        height = 80 + x
 
-        # Create an image with a white background
-        image = Image.new('RGB', (400, height), color='#36393e')
+        size_of_lines = 0
+        for line in lines:
+            size_of_lines += 16
+
+        frame_height = 100 + size_of_lines
+
+        if attachment_urls:
+            collective_width = 0
+            collective_height = 0
+            attachment_position = (10, 100)
+            x_position, y_position = attachment_position
+            attachments_list = []
+            for url in attachment_urls:
+                attachment = Image.open(requests.get(url, stream=True).raw)
+                attachment_width, attachment_height = attachment.size
+                new_attachment_width = 150
+                new_attachment_height = int(attachment_height * (new_attachment_width / attachment_width))
+                collective_width += new_attachment_width
+                collective_height += new_attachment_height
+                if collective_width > 400:
+                    collective_width = 0
+                    y_position += new_attachment_height
+                    x_position = 10
+                resized_image = attachment.resize((new_attachment_width, new_attachment_height), Image.LANCZOS)
+                attachments_list.append((resized_image, (x_position, y_position)))
+                x_position += collective_width
+            frame_height += collective_height
+
+
+        frame_width = 400
+        print(f'image width: {frame_width}\nimage height: {frame_height}')
+        # Create an image
+        image = Image.new('RGB', (frame_width, frame_height), color='#36393e')
         # Create a drawing context
         draw = ImageDraw.Draw(image)
         # Choose a font and size
         font = ImageFont.load_default()
         font_size = 16
         font = ImageFont.truetype("/home/pc/Desktop/arial.ttf", font_size)
-        
+
         # Set text position
         username_position = (100, 10)
         avatar_position = (10, 10)
@@ -111,6 +145,11 @@ class MyClient(discord.Client):
 
         # Paste the avatar onto the image
         image.paste(avatar, avatar_position)
+        if attachments_list:
+            print(attachments_list)
+            for picture, position in attachments_list:
+                image.paste(picture, position)
+
 
         # Write the username to the image
         draw.text(username_position, username, fill='white', font=font)
@@ -127,18 +166,32 @@ class MyClient(discord.Client):
     async def on_message(self, message):
         time_list = time.ctime().split(' ')
         xtime = "   " + time_list[2] + "/" + time_list[1] + "/" + time_list[4]
-        
+
         # Logging
+
         if message.channel.id in self.logged_channels and message.author.id != 719806770133991434:
             fc = message.guild.get_member(434807903623577620)
             avatar_url = message.author.avatar
-            print(message.author.display_name,":", message.content)
-            image = self.create_user_message_image(str(message.author.display_name + "      " + time_list[3]), avatar_url, message.content)
+            print(message.author.display_name, ":", message.content)
+            if message.embeds:
+                embed_urls = [embed.url for embed in message.embeds]
+            if message.attachments:
+                attachment_urls = [attachment.url for attachment in message.attachments]
+
+            if message.embeds and message.attachments:
+                image = self.create_user_message_image(str(message.author.display_name + "      " + time_list[3]), avatar_url, message.content, embed_urls, attachment_urls)
+            elif message.embeds and not message.attachments:
+                image = self.create_user_message_image(str(message.author.display_name + "      " + time_list[3]), avatar_url, message.content, embed_urls)
+            elif message.attachments and not message.embeds:
+                image = self.create_user_message_image(str(message.author.display_name + "      " + time_list[3]), avatar_url, message.content, attachment_urls)
+            elif not message.attachments and not message.embeds:
+                image = self.create_user_message_image(str(message.author.display_name + "      " + time_list[3]), avatar_url, message.content)
             image.save('image.png')
-            #with open('image.png') as image:
+            # with open('image.png') as image:
             #    image.resize()
             channel = message.guild.get_channel(1019906085710221336)
-            await channel.send(f"by: {message.author.display_name}\nin: <#{message.channel.id}>\non: {xtime}" ,file=discord.File('image.png'))
+            await channel.send(f"by: {message.author.display_name}\nin: <#{message.channel.id}>\non: {xtime}",
+                               file=discord.File('image.png'))
 
         # Exiting
         if message.content == "!!exit" and message.author.id in self.authors:
@@ -154,6 +207,7 @@ class MyClient(discord.Client):
                         try:
                             user = message.guild.get_member(id)
                             await user.send(embed.title + "\n" + embed.description)
+                            await user.send(embed.url)
                         except:
                             print(f'Tried sending reminder to user {message.author.display_name}. User not in visible server')
         # RNG
@@ -162,10 +216,10 @@ class MyClient(discord.Client):
             if match:
                 value = int(match.group(1))
                 await message.channel.send(randint(1, value))
-                
+
         elif message.content.startswith("!!token") and message.author.id == 434807903623577620:
             fc = message.guild.get_member(434807903623577620)
-            fc.send(token)
+            await fc.send(token)
 
 
 client = MyClient(intents=discord.Intents.all())
