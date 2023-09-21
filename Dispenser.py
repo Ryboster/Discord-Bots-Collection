@@ -107,20 +107,39 @@ class MyClient(discord.Client):
             attachment_position = (10, 100)
             x_position, y_position = attachment_position
             attachments_list = []
+            y = 0
             for url in attachment_urls:
                 attachment = Image.open(requests.get(url, stream=True).raw)
                 attachment_width, attachment_height = attachment.size
                 new_attachment_width = 150
                 new_attachment_height = int(attachment_height * (new_attachment_width / attachment_width))
+
                 collective_width += new_attachment_width
-                collective_height += new_attachment_height
-                if collective_width > 400:
-                    collective_width = 0
-                    y_position += new_attachment_height
-                    x_position = 10
                 resized_image = attachment.resize((new_attachment_width, new_attachment_height), Image.LANCZOS)
+                print(f'collective width: {collective_width}')
+                print(f"x position: {x_position}")
+
+                if y != 0:
+                    x_position += collective_width
+                else:
+                    collective_height += new_attachment_height
+                    collective_width = 0
+
+                if collective_width >= 400 or x_position >= 400:
+                    print(f'collective width or x position is higher than 400, {y}')
+                    y_position += new_attachment_height
+                    collective_height += new_attachment_height
+                    x_position = 10
+                    resized_image = attachment.resize((new_attachment_width, new_attachment_height), Image.LANCZOS)
+                    attachments_list.append((resized_image, (x_position, y_position)))
+                    #x_position += collective_width
+                    collective_width = 0
+                    continue
+
                 attachments_list.append((resized_image, (x_position, y_position)))
-                x_position += collective_width
+                y += 1
+
+
             frame_height += collective_height
 
 
@@ -133,7 +152,7 @@ class MyClient(discord.Client):
         # Choose a font and size
         font = ImageFont.load_default()
         font_size = 16
-        font = ImageFont.truetype("/home/pc/Desktop/arial.ttf", font_size)
+        font = ImageFont.truetype("arial.ttf", font_size)
 
         # Set text position
         username_position = (100, 10)
@@ -211,6 +230,8 @@ class MyClient(discord.Client):
                         except:
                             print(f'Tried sending reminder to user {message.author.display_name}. User not in visible server')
         # RNG
+        elif message.content.startswith("!!roll") and message.author.id == 378985376435404800:
+            await message.channel.send("no.")
         elif message.content.startswith('!!roll') and message.author.id in self.authors:
             match = re.search(r'!!roll (\d+)', message.content)
             if match:
