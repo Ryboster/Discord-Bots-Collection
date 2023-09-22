@@ -1,4 +1,4 @@
 emojis==0.7.0
 Pillow==9.5.0
 requests==2.31.0
-
+discord.py==2.2.3
