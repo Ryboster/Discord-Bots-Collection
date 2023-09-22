@@ -84,7 +84,7 @@ class MyClient(discord.Client):
         lines = []
         current_line = ""
         draw = ImageDraw.Draw(Image.new('RGB', (400, 400), color='#36393e'))
-        font = ImageFont.truetype("/home/pc/Desktop/arial.ttf", 16)
+        font = ImageFont.truetype("arial.ttf", 16)
         for word in message_content.split():
             text_size = draw.textsize(current_line + word, font=font)
             if text_size[0] <= 300:
