@@ -215,7 +215,7 @@ class MyClient(discord.Client):
         if message.content == "!!exit" and message.author.id in self.authors:
             print('Shutting down ...')
             await self.close()
-            quit()
+            quit(69)
 
         # Reminding
         elif message.author.id == 719806770133991434:
