@@ -1,7 +1,6 @@
 import discord
 import emojis
 import sys
-import pyautogui
 from PIL import Image, ImageDraw, ImageFont
 import requests
 import time
