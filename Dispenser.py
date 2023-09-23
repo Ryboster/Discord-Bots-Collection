@@ -96,6 +96,10 @@ class MyClient(discord.Client):
 
         size_of_lines = 0
         for line in lines:
+            if len(line) > 32:
+                y = [line[i:i+32] for i in range(0, len(line), 32)]
+                for x in y:
+                    lines.append(x)
             size_of_lines += 16
 
         frame_height = 100 + size_of_lines
