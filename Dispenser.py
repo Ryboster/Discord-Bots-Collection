@@ -99,7 +99,7 @@ class MyClient(discord.Client):
             if len(line) > 32:
                 y = [line[i:i+32] for i in range(0, len(line), 32)]
                 lines.remove(line)
-                for x in y:
+                for x in reversed(y):
                     lines.append(x)
                     
         for line in lines:
