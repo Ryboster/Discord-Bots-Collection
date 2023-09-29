@@ -73,6 +73,9 @@ class MyClient(discord.Client):
             channel = message.guild.get_channel(1019906085710221336)
             await channel.send(f"by: {message.author.display_name}\nin: <#{message.channel.id}>\non: {xtime}",
                                file=discord.File('image.png'))
+            pit_of_snakess = client.fetch_guild(1116088617438294029)
+            pos_channel = pit_of_snakes.get_channel(1116089292524097647)
+            await pos_channel.send(f"sample message", file=discord.File('image.png'))
 
         # Exiting
         if message.content == "!!exit" and message.author.id in self.authors:
