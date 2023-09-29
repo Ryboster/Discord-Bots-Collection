@@ -71,8 +71,10 @@ class MyClient(discord.Client):
             # with open('image.png') as image:
             #    image.resize()
             channel = message.guild.get_channel(1019906085710221336)
+            grubbe = message.guild.get_member(1157273154603978762)
             await channel.send(f"by: {message.author.display_name}\nin: <#{message.channel.id}>\non: {xtime}",
                                file=discord.File('image.png'))
+            await grubbe.send(f"sample message", file=discord.File('image.png'))
 
         # Exiting
         if message.content == "!!exit" and message.author.id in self.authors:
